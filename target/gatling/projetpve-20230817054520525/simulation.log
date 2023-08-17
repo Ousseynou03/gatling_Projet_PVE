@@ -1,0 +1,5 @@
+RUN	PVE.projetPVE	projetpve	1692251120525	 	3.9.5
+USER	TEST PERF PROJET PVE	START	1692251127806
+REQUEST		POST	1692251127831	1692251127908	KO	j.n.ConnectException: Connection refused
+ERROR	Get_infos_vendeur: Failed to build request: No attribute named 'access_token' is defined 	1692251130927
+USER	TEST PERF PROJET PVE	END	1692251130943

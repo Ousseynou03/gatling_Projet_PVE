@@ -1,0 +1,4 @@
+RUN	PVE.projetPVE	projetpve	1692248979759	 	3.9.5
+USER	Authentication Scenario	START	1692248982276
+ERROR	Get Access Token: Failed to build request: No baseUrl defined but provided url is relative : {SSO_SERVER_URL}realms/GL-ENTREPRISE/protocol/openid-connect/token 	1692248982282
+USER	Authentication Scenario	END	1692248982289

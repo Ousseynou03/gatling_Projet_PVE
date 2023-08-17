@@ -1,0 +1,6 @@
+RUN	PVE.projetPVE	projetpve	1692251882177	 	3.9.5
+USER	TEST PERF PROJET PVE	START	1692251889832
+REQUEST		POST	1692251889863	1692251890207	KO	j.n.ConnectException: Connection refused
+ERROR	Get_infos_vendeur: Failed to build request: No attribute named 'access_token' is defined 	1692251893222
+ERROR	Get_infos_Magasin: Failed to build request: No attribute named 'storeCode' is defined 	1692251898229
+USER	TEST PERF PROJET PVE	END	1692251898232

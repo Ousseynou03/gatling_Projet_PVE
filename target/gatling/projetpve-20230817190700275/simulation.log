@@ -1,0 +1,22 @@
+RUN	PVE.projetPVE	projetpve	1692299220275	 	3.9.5
+USER	TEST PERF PROJET PVE PRODUIT UGA	START	1692299227686
+REQUEST		POST	1692299227712	1692299227967	KO	j.n.ConnectException: Connection refused
+ERROR	Get_infos_vendeur: Failed to build request: No attribute named 'access_token' is defined 	1692299227982
+ERROR	Get_infos_Magasin: Failed to build request: No attribute named 'user_StoreCode' is defined 	1692299227984
+ERROR	Recherche de produit par UGA: Failed to build request: No attribute named 'access_token' is defined 	1692299227985
+ERROR	Get Feature Flipping: Failed to build request: No attribute named 'access_token' is defined 	1692299227985
+ERROR	Get Product Stock: Failed to build request: No attribute named 'access_token' is defined 	1692299227986
+ERROR	Get Nearby Stores: Failed to build request: No attribute named 'storeLatitude' is defined 	1692299227986
+ERROR	Get Tracking Recommendation ID: Failed to build request: No attribute named 'access_token' is defined 	1692299227987
+ERROR	Get Additional Recommendation ID: Failed to build request: No attribute named 'PVE_IDENTIFIER' is defined 	1692299227987
+ERROR	Get Similar Recommendation ID: Failed to build request: No attribute named 'PVE_IDENTIFIER' is defined 	1692299227987
+ERROR	Recommendation Tracking: Failed to build request: No attribute named 'access_token' is defined 	1692299227987
+ERROR	Recommendation for Similar: Failed to build request: No attribute named 'access_token' is defined 	1692299227987
+ERROR	Recommendation for Additional: Failed to build request: No attribute named 'access_token' is defined 	1692299227988
+ERROR	Get Tracking Recommendation ID: Failed to build request: No attribute named 'access_token' is defined 	1692299227988
+ERROR	Get Additional Recommendation ID: Failed to build request: No attribute named 'PVE_IDENTIFIER' is defined 	1692299227988
+ERROR	Get Similar Recommendation ID: Failed to build request: No attribute named 'PVE_IDENTIFIER' is defined 	1692299227988
+ERROR	Recommendation Tracking: Failed to build request: No attribute named 'access_token' is defined 	1692299227988
+ERROR	Recommendation for Similar: Failed to build request: No attribute named 'access_token' is defined 	1692299227989
+ERROR	Recommendation for Additional: Failed to build request: No attribute named 'access_token' is defined 	1692299227989
+USER	TEST PERF PROJET PVE PRODUIT UGA	END	1692299227991
