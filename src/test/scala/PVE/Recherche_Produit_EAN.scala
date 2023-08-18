@@ -1,6 +1,5 @@
 package PVE
 
-import PVE.Recherche_Produit_UGA.FichierPath
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.core.structure.ChainBuilder
@@ -65,10 +64,11 @@ object Recherche_Produit_EAN {
 
   def get_Product_By_EAN() = {
     exec(http("Search Product by EAN")
-      .get("{PVE_SERVER_URL}product-orchestration/${EAN}?type=EAN&getCcmProduct=true")
-      .header("Authorization", "Bearer ${access_token}")
-      .check(jsonPath("$.sapProduct.code").saveAs("UGA"))
-      .check(jsonPath("$.sapProduct.price.value").saveAs("PRICE"))
+      .get("{PVE_SERVER_URL}product-orchestration/#{EAN}?type=EAN&getCcmProduct=true")
+      .header("Authorization", "Bearer #{access_token}")
+      .check(jsonPath("#.sapProduct.code").saveAs("UGA"))
+      .check(jsonPath("#.sapProduct.price.value").saveAs("PRICE"))
+      .check(jsonPath("#.sapProduct.categories[*].name").findAll.saveAs("PVE_IDENTIFIER"))
     )
   }
 
@@ -76,35 +76,35 @@ object Recherche_Produit_EAN {
   def tracking_page() = {
     exec(http("Tracking Page")
       .get("recoT2sPageId?brand=GL&recoType=TRACKING&pageScope=PRODUCT")
-      .header("Authorization", "Bearer ${access_token}")
-      .check(jsonPath("$.idT2sPage").saveAs("ID_T2S_PAGE_TRACKING"))
+      .header("Authorization", "Bearer #{access_token}")
+      .check(jsonPath("#.idT2sPage").saveAs("ID_T2S_PAGE_TRACKING"))
     )
   }
 
   def get_Additional_Recommandation()  = {
     exec(http("Get Additional Recommendation ID")
-      .get("recoT2sPageId?brand=GL&recoType=ADDITIONAL&pageScope=PRODUCT&pveIdentifier=${PVE_IDENTIFIER}")
-      .header("Authorization", "Bearer ${access_token}")
-      .check(jsonPath("$.idT2sPage").saveAs("idT2sPageAdditional"))
+      .get("recoT2sPageId?brand=GL&recoType=ADDITIONAL&pageScope=PRODUCT&pveIdentifier=#{PVE_IDENTIFIER}")
+      .header("Authorization", "Bearer #{access_token}")
+      .check(jsonPath("#.idT2sPage").saveAs("idT2sPageAdditional"))
     )
   }
 
   def get_Similar_Recommandation() = {
   exec(http("Get Similar Recommendation ID")
-      .get("recoT2sPageId?brand=GL&recoType=SIMILAR&pageScope=PRODUCT&pveIdentifier=${PVE_IDENTIFIER}")
-      .header("Authorization", "Bearer ${access_token}")
-      .check(jsonPath("$.idT2sPage").saveAs("idT2sPageSimilar"))
+      .get("recoT2sPageId?brand=GL&recoType=SIMILAR&pageScope=PRODUCT&pveIdentifier=#{PVE_IDENTIFIER}")
+      .header("Authorization", "Bearer #{access_token}")
+      .check(jsonPath("#.idT2sPage").saveAs("idT2sPageSimilar"))
     )
   }
 
   def get_Produit_Stock() = {
   exec(http("Get Nearby Stores")
-      .get("sap/stores?latitude=${storeLatitude}&longitude=${storeLongitude}&pageSize=1000&radius=10000000")
-      .header("Authorization", "Bearer ${access_token}")
+      .get("sap/stores?latitude=#{storeLatitude}&longitude=#{storeLongitude}&pageSize=1000&radius=10000000")
+      .header("Authorization", "Bearer #{access_token}")
     )
       .exec(http("Get Product Stock")
-        .get("estock/productStock?productCode=${UGA}")
-        .header("Authorization", "Bearer ${access_token}")
+        .get("estock/productStock?productCode=#{UGA}")
+        .header("Authorization", "Bearer #{access_token}")
       )
   }
 
@@ -119,41 +119,57 @@ object Recherche_Produit_EAN {
       }
       .exec(http("Recommendation Tracking")
         .post("recommendation/tracking")
-        .header("Authorization", "Bearer ${access_token}")
+        .header("Authorization", "Bearer #{access_token}")
         .body(StringBody(
           """
             |{
-            |"pID":"${idT2sPageTracking}",
-            |"tID":"${UUID_V4}",
-            |"iID":["${PVE_IDENTIFIER}"],
+            |"pID":"#{idT2sPageTracking}",
+            |"tID":"#{UUID_V4}",
+            |"iID":["#{PVE_IDENTIFIER}"],
             |"eN":"VIEW"
             |}
             |""".stripMargin)).asJson
       )
       .exec(http("Recommendation for Additional")
         .post("recommendation")
-        .header("Authorization", "Bearer ${access_token}")
+        .header("Authorization", "Bearer #{access_token}")
         .body(StringBody(
           """
             |{
-            |"tID":"${UUID_V4}",
-            |"iID":"${UGA}-${COLOR_VARIANT}",
-            |"pID":"${idT2sPageAdditional}",
-            |"setID":"${user_StoreCode}"}""".stripMargin)).asJson
+            |"tID":"#{UUID_V4}",
+            |"iID":"#{UGA}-${COLOR_VARIANT}",
+            |"pID":"#{idT2sPageAdditional}",
+            |"setID":"#{user_StoreCode}"
+            |}
+            |""".stripMargin)).asJson
       )
       .exec(http("Recommendation for Similar")
         .post("recommendation")
-        .header("Authorization", "Bearer ${access_token}")
+        .header("Authorization", "Bearer #{access_token}")
         .body(StringBody(
           """
             |{
-            |"tID":"${UUID_V4}",
-            |"iID":"${UGA}-${COLOR_VARIANT}",
-            |"pID":"${idT2sPageSimilar}",
-            |"setID":"${user_StoreCode}"
+            |"tID":"#{UUID_V4}",
+            |"iID":"#{UGA}-${COLOR_VARIANT}",
+            |"pID":"#{idT2sPageSimilar}",
+            |"setID":"#{user_StoreCode}"
             |}
             |""".stripMargin)).asJson
       )
   }
 
+
+  val scnRechercheParENA = scenario("Test Perf Recherche EAN")
+    .feed(jddDataPVE)
+    .feed(jddDataUGA)
+    .exec(Autentication())
+    .exec(getInfosVendeur())
+    .exec(getInfosMagasin())
+    .feed(jddDataEAN)
+    .exec(get_Product_By_EAN())
+    .exec(tracking_page())
+    .exec(get_Additional_Recommandation())
+    .exec(get_Similar_Recommandation())
+    .exec(get_Produit_Stock())
+    .exec(recommandation_traking())
   }

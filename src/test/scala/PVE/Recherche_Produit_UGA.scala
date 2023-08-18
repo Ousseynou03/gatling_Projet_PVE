@@ -63,13 +63,18 @@ object Recherche_Produit_UGA {
   /////////////////////////////////////////////
 
   def rechercheProduitUga() = {
-    exec(http("Recherche de produit par UGA")
+  exec { session =>
+      val categories = session("PVE_IDENTIFIER").as[Seq[String]]
+      val PVE_IDENTIFIER = categories.mkString("|")
+      println("PVE_IDENTIFIER: " + PVE_IDENTIFIER)
+      session.set("PVE_IDENTIFIER", PVE_IDENTIFIER)
+    }
+    .exec(http("Recherche de produit par UGA")
       .get("product-orchestration/#{UGA}?type=uga&getCcmProduct=true")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
       .check(jsonPath("#.sapProduct.price.value").saveAs("Price"))
-      .check(jsonPath("#.sapProduct.categories[0].name").saveAs("Category_1"))
-      .check(jsonPath("#.sapProduct.categories[1].name").saveAs("Category_2"))
+      .check(jsonPath("$.sapProduct.categories[*].name").findAll.saveAs("PVE_IDENTIFIER"))
       .check(status.is(200)))
   }
 
@@ -108,40 +113,64 @@ object Recherche_Produit_UGA {
       )
       .exec(http("Get Additional Recommendation ID")
         .get("recoT2sPageId?brand=GL&recoType=ADDITIONAL&pageScope=PRODUCT&pveIdentifier=${PVE_IDENTIFIER}")
-        .header("Authorization", "Bearer ${accessToken}")
+        .header("Authorization", "Bearer ${access_token}")
         .check(jsonPath("$.idT2sPage").saveAs("idT2sPageAdditional"))
       )
       .exec(http("Get Similar Recommendation ID")
         .get("recoT2sPageId?brand=GL&recoType=SIMILAR&pageScope=PRODUCT&pveIdentifier=${PVE_IDENTIFIER}")
-        .header("Authorization", "Bearer ${accessToken}")
+        .header("Authorization", "Bearer ${access_token}")
         .check(jsonPath("$.idT2sPage").saveAs("idT2sPageSimilar"))
       )
 
       .exec(http("Recommendation Tracking")
         .post("recommendation/tracking")
         .header("Authorization", "Bearer ${access_token}")
-        .body(StringBody("""{"pID":"${idT2sPageTracking}","tID":"${UUID_V4}","iID":["${PVE_IDENTIFIER}"],"eN":"VIEW"}""")).asJson
+        .body(StringBody(
+          """
+            |{
+            |"pID":"${idT2sPageTracking}",
+            |"tID":"${UUID_V4}",
+            |"iID":["${PVE_IDENTIFIER}"],
+            |"eN":"VIEW"
+            |}
+            |""".stripMargin)).asJson
       )
       .exec(http("Recommendation for Similar")
         .post("recommendation")
         .header("Authorization", "Bearer ${access_token}")
-        .body(StringBody("""{"tID":"${UUID_V4}","iID":"${UGA}-${COLOR_VARIANT}","pID":"${idT2sPageSimilar}","setID":"${user_StoreCode}"}""")).asJson
+        .body(StringBody(
+          """
+            |{
+            |"tID":"${UUID_V4}",
+            |"iID":"${UGA}-${COLOR_VARIANT}",
+            |"pID":"${idT2sPageSimilar}",
+            |"setID":"${user_StoreCode}"
+            |}
+            |""".stripMargin)).asJson
       )
       .exec(http("Recommendation for Additional")
         .post("recommendation")
         .header("Authorization", "Bearer ${access_token}")
-        .body(StringBody("""{"tID":"${UUID_V4}","iID":"${UGA}-${COLOR_VARIANT}","pID":"${idT2sPageAdditional}","setID":"${user_StoreCode}"}""")).asJson
+        .body(StringBody(
+          """
+            |{
+            |"tID":"${UUID_V4}",
+            |"iID":"${UGA}-${COLOR_VARIANT}",
+            |"pID":"${idT2sPageAdditional}",
+            |"setID":"${user_StoreCode}"
+            |}
+            |""".stripMargin)).asJson
       )
   }
 
   val scnRechercheParUGA = scenario("TEST PERF PROJET PVE")
     .feed(jddDataPVE)
     .feed(jddDataUGA)
-    .exec(Autentication()
-      .exec(getInfosVendeur())
-      .exec(getInfosMagasin())
-      .exec(rechercheProduitUga())
-      .exec(get_Infos_UGA()))
+    .exec(Autentication())
+    .exec(getInfosVendeur())
+    .exec(getInfosMagasin())
+    .exec(rechercheProduitUga())
+    .exec(get_Infos_UGA())
     .exec(perform_Recommendations())
     .exec(perform_Recommendations())
 
