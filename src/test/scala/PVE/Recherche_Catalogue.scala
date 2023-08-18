@@ -34,8 +34,8 @@ object Recherche_Catalogue {
       .get("auth/login/employee")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.badgeNumber").saveAs("user_BadgeNumber"))
-      .check(jsonPath("#.storeCode").saveAs("user_StoreCode"))
+      .check(jsonPath("$.badgeNumber").saveAs("user_BadgeNumber"))
+      .check(jsonPath("$.storeCode").saveAs("user_StoreCode"))
       .check(status.is(200)))
   }
 
@@ -46,8 +46,8 @@ object Recherche_Catalogue {
       .get("sap/stores/storeCode/#{user_StoreCode}")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.sourceLatitude").saveAs("storeLatitude"))
-      .check(jsonPath("#.sourceLongitude").saveAs("storeLongitude"))
+      .check(jsonPath("$.sourceLatitude").saveAs("storeLatitude"))
+      .check(jsonPath("$.sourceLongitude").saveAs("storeLongitude"))
       .check(status.is(200)))
   }
 
@@ -61,7 +61,7 @@ object Recherche_Catalogue {
     exec(http("Search Catalog First Level")
       .get("sap/products/search?query=&currentPage=0")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.facets[?(@.code == 'categories')].values[0].query.query.value").saveAs("QUERY_VALUE"))
+      .check(jsonPath("$.facets[?(@.code == 'categories')].values[0].query.query.value").saveAs("QUERY_VALUE"))
     )
   }
 
@@ -69,7 +69,7 @@ object Recherche_Catalogue {
     exec(http("Search Catalog Next Level")
       .get("sap/products/search?query=#{QUERY_VALUE(current)}&currentPage=0")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.facets[?(@.code == 'categories')].values[0].query.query.value").saveAs("QUERY_VALUE(next)"))
+      .check(jsonPath("$.facets[?(@.code == 'categories')].values[0].query.query.value").saveAs("QUERY_VALUE(next)"))
     )
   }
 

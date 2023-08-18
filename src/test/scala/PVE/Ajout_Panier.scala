@@ -40,8 +40,8 @@ object Ajout_Panier{
       .get("auth/login/employee")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.badgeNumber").saveAs("user_BadgeNumber"))
-      .check(jsonPath("#.storeCode").saveAs("user_StoreCode"))
+      .check(jsonPath("$.badgeNumber").saveAs("user_BadgeNumber"))
+      .check(jsonPath("$.storeCode").saveAs("user_StoreCode"))
       .check(status.is(200)))
   }
 
@@ -52,8 +52,8 @@ object Ajout_Panier{
       .get("sap/stores/storeCode/#{user_StoreCode}")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.sourceLatitude").saveAs("storeLatitude"))
-      .check(jsonPath("#.sourceLongitude").saveAs("storeLongitude"))
+      .check(jsonPath("$.sourceLatitude").saveAs("storeLatitude"))
+      .check(jsonPath("$.sourceLongitude").saveAs("storeLongitude"))
       .check(status.is(200)))
   }
 
@@ -66,7 +66,7 @@ object Ajout_Panier{
       .post("{sap/anonymous/carts")
       .header("Authorization", "Bearer #{access_token}")
       .body(StringBody("{}")).asJson
-      .check(jsonPath("#.guid").saveAs("cart_Guid"))
+      .check(jsonPath("$.guid").saveAs("cart_Guid"))
     )
   }
 
@@ -118,7 +118,7 @@ object Ajout_Panier{
           |}
           |}
           |}""".stripMargin)).asJson
-      .check(jsonPath("#.hits[0].source.Id").saveAs("customer_Num_Fid"))
+      .check(jsonPath("$.hits[0].source.Id").saveAs("customer_Num_Fid"))
     )
   }
 
@@ -126,25 +126,25 @@ object Ajout_Panier{
     exec(http("Get Client Info")
       .get("client/fid/#{customer_Num_Fid}")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.Id").saveAs("CUSTOMER_ADDRESS_ID"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.Type").saveAs("CUSTOMER_ADDRESS_TYPE"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.AddressLine1").saveAs("CUSTOMER_ADDRESS_LINE_1"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.AddressLine2").saveAs("CUSTOMER_ADDRESS_LINE_2"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.CivilityCode").saveAs("CUSTOMER_ADDRESS_CIVILITY_CODE"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.City").saveAs("CUSTOMER_CITY"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.PostalCode").saveAs("CUSTOMER_ADDRESS_POSTAL_CODE"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.CountryCode").saveAs("CUSTOMER_ADDRESS_COUNTRY_CODE"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.IsDelivery").saveAs("CUSTOMER_ADDRESS_IS_DELIVERY"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.IsBilling").saveAs("CUSTOMER_ADDRESS_IS_BILLING"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.Npai").saveAs("CUSTOMER_ADDRESS_NPAI"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.Company").saveAs("CUSTOMER_ADDRESS_COMPANY"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.Firstname").saveAs("CUSTOMER_ADDRESS_FIRSTNAME"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.Name").saveAs("CUSTOMER_ADDRESS_NAME"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.Label").saveAs("CUSTOMER_ADDRESS_LABEL"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.PhoneNumber").saveAs("CUSTOMER_ADDRESS_PHONENUMBER"))
-      .check(jsonPath("#Customer.PersonalInfo.Postal.State").saveAs("CUSTOMER_ADDRESS_STATE"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.AddressLine3").saveAs("CUSTOMER_ADDRESS_LINE_3"))
-      .check(jsonPath("#.Customer.PersonalInfo.Postal.AddressLine4").saveAs("CUSTOMER_ADDRESS_LINE_4"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.Id").saveAs("CUSTOMER_ADDRESS_ID"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.Type").saveAs("CUSTOMER_ADDRESS_TYPE"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.AddressLine1").saveAs("CUSTOMER_ADDRESS_LINE_1"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.AddressLine2").saveAs("CUSTOMER_ADDRESS_LINE_2"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.CivilityCode").saveAs("CUSTOMER_ADDRESS_CIVILITY_CODE"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.City").saveAs("CUSTOMER_CITY"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.PostalCode").saveAs("CUSTOMER_ADDRESS_POSTAL_CODE"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.CountryCode").saveAs("CUSTOMER_ADDRESS_COUNTRY_CODE"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.IsDelivery").saveAs("CUSTOMER_ADDRESS_IS_DELIVERY"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.IsBilling").saveAs("CUSTOMER_ADDRESS_IS_BILLING"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.Npai").saveAs("CUSTOMER_ADDRESS_NPAI"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.Company").saveAs("CUSTOMER_ADDRESS_COMPANY"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.Firstname").saveAs("CUSTOMER_ADDRESS_FIRSTNAME"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.Name").saveAs("CUSTOMER_ADDRESS_NAME"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.Label").saveAs("CUSTOMER_ADDRESS_LABEL"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.PhoneNumber").saveAs("CUSTOMER_ADDRESS_PHONENUMBER"))
+      .check(jsonPath("$Customer.PersonalInfo.Postal.State").saveAs("CUSTOMER_ADDRESS_STATE"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.AddressLine3").saveAs("CUSTOMER_ADDRESS_LINE_3"))
+      .check(jsonPath("$.Customer.PersonalInfo.Postal.AddressLine4").saveAs("CUSTOMER_ADDRESS_LINE_4"))
     )
   }
 
@@ -169,7 +169,7 @@ object Ajout_Panier{
     exec(http("Select Delivery Mode")
       .get("sap/#{CUSTOMER_MAIL}/carts/#{cart_Guid}/suborder/deliverymodes?entriesNumbers=0")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.deliveryModes[0].code").saveAs("DELIVERYMODE_CODE"))
+      .check(jsonPath("$.deliveryModes[0].code").saveAs("DELIVERYMODE_CODE"))
     )
   }
 
@@ -177,7 +177,7 @@ object Ajout_Panier{
     exec(http("Select Store")
       .get("sap/stores?pageSize=1000")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.stores[0].name").saveAs("STORE_NAME"))
+      .check(jsonPath("$.stores[0].name").saveAs("STORE_NAME"))
     )
   }
 
@@ -234,7 +234,7 @@ object Ajout_Panier{
     .exec(http("Confirm Payment")
       .get("recoT2sPageId?brand=GL&recoType=TRACKING&pageScope=CONFIRM_PAYMENT")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.idT2sPage").saveAs("idT2sPageConfirmPayment"))
+      .check(jsonPath("$.idT2sPage").saveAs("idT2sPageConfirmPayment"))
     )
       .exec(http("Recommendation Tracking")
         .post("recommendation/tracking")

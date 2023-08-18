@@ -12,7 +12,6 @@ class projetPVE extends Simulation{
 
 
   val httpProtocol = http.baseUrl(host)
-    .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
     .acceptEncodingHeader("gzip, deflate")
     .acceptLanguageHeader("fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3")
     .userAgentHeader("TESTS-DE-PERF-PROJET-PVE")

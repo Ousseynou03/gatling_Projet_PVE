@@ -40,8 +40,8 @@ object Recherche_Produit_EAN {
       .get("auth/login/employee")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.badgeNumber").saveAs("user_BadgeNumber"))
-      .check(jsonPath("#.storeCode").saveAs("user_StoreCode"))
+      .check(jsonPath("$.badgeNumber").saveAs("user_BadgeNumber"))
+      .check(jsonPath("$.storeCode").saveAs("user_StoreCode"))
       .check(status.is(200)))
   }
 
@@ -52,8 +52,8 @@ object Recherche_Produit_EAN {
       .get("sap/stores/storeCode/#{user_StoreCode}")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.sourceLatitude").saveAs("storeLatitude"))
-      .check(jsonPath("#.sourceLongitude").saveAs("storeLongitude"))
+      .check(jsonPath("$.sourceLatitude").saveAs("storeLatitude"))
+      .check(jsonPath("$.sourceLongitude").saveAs("storeLongitude"))
       .check(status.is(200)))
   }
 
@@ -66,9 +66,9 @@ object Recherche_Produit_EAN {
     exec(http("Search Product by EAN")
       .get("{PVE_SERVER_URL}product-orchestration/#{EAN}?type=EAN&getCcmProduct=true")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.sapProduct.code").saveAs("UGA"))
-      .check(jsonPath("#.sapProduct.price.value").saveAs("PRICE"))
-      .check(jsonPath("#.sapProduct.categories[*].name").findAll.saveAs("PVE_IDENTIFIER"))
+      .check(jsonPath("$.sapProduct.code").saveAs("UGA"))
+      .check(jsonPath("$.sapProduct.price.value").saveAs("PRICE"))
+      .check(jsonPath("$.sapProduct.categories[*].name").findAll.saveAs("PVE_IDENTIFIER"))
     )
   }
 
@@ -77,7 +77,7 @@ object Recherche_Produit_EAN {
     exec(http("Tracking Page")
       .get("recoT2sPageId?brand=GL&recoType=TRACKING&pageScope=PRODUCT")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.idT2sPage").saveAs("ID_T2S_PAGE_TRACKING"))
+      .check(jsonPath("$.idT2sPage").saveAs("ID_T2S_PAGE_TRACKING"))
     )
   }
 
@@ -85,7 +85,7 @@ object Recherche_Produit_EAN {
     exec(http("Get Additional Recommendation ID")
       .get("recoT2sPageId?brand=GL&recoType=ADDITIONAL&pageScope=PRODUCT&pveIdentifier=#{PVE_IDENTIFIER}")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.idT2sPage").saveAs("idT2sPageAdditional"))
+      .check(jsonPath("$.idT2sPage").saveAs("idT2sPageAdditional"))
     )
   }
 
@@ -93,7 +93,7 @@ object Recherche_Produit_EAN {
   exec(http("Get Similar Recommendation ID")
       .get("recoT2sPageId?brand=GL&recoType=SIMILAR&pageScope=PRODUCT&pveIdentifier=#{PVE_IDENTIFIER}")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.idT2sPage").saveAs("idT2sPageSimilar"))
+      .check(jsonPath("$.idT2sPage").saveAs("idT2sPageSimilar"))
     )
   }
 

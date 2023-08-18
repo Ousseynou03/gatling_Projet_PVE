@@ -41,8 +41,8 @@ object Recherche_Produit_Par_Mot_Cle {
       .get("auth/login/employee")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.badgeNumber").saveAs("user_BadgeNumber"))
-      .check(jsonPath("#.storeCode").saveAs("user_StoreCode"))
+      .check(jsonPath("$.badgeNumber").saveAs("user_BadgeNumber"))
+      .check(jsonPath("$.storeCode").saveAs("user_StoreCode"))
       .check(status.is(200)))
   }
 
@@ -53,8 +53,8 @@ object Recherche_Produit_Par_Mot_Cle {
       .get("sap/stores/storeCode/#{user_StoreCode}")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.sourceLatitude").saveAs("storeLatitude"))
-      .check(jsonPath("#.sourceLongitude").saveAs("storeLongitude"))
+      .check(jsonPath("$.sourceLatitude").saveAs("storeLatitude"))
+      .check(jsonPath("$.sourceLongitude").saveAs("storeLongitude"))
       .check(status.is(200)))
   }
 
@@ -66,7 +66,7 @@ object Recherche_Produit_Par_Mot_Cle {
     exec(http("Search Products by Keyword")
       .get("sap/products/search?query=#{SEARCH_TERM}&currentPage=0")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.products[*].basicColor").findAll.saveAs("basicColors"))
+      .check(jsonPath("$.products[*].basicColor").findAll.saveAs("basicColors"))
     )
       .exec { session =>
         val colors = session("basicColors").as[Seq[String]]
@@ -79,7 +79,7 @@ object Recherche_Produit_Par_Mot_Cle {
     exec(http("Get Tracking Page ID")
       .get("recoT2sPageId?brand=GL&recoType=TRACKING&pageScope=PRODUCT_RESULT")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.idT2sPage").saveAs("idT2sPageTracking"))
+      .check(jsonPath("$.idT2sPage").saveAs("idT2sPageTracking"))
     )
   }
 

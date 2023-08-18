@@ -41,8 +41,8 @@ object Recherche_Produit_UGA {
       .get("auth/login/employee")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.badgeNumber").saveAs("user_BadgeNumber"))
-      .check(jsonPath("#.storeCode").saveAs("user_StoreCode"))
+      .check(jsonPath("$.badgeNumber").saveAs("user_BadgeNumber"))
+      .check(jsonPath("$.storeCode").saveAs("user_StoreCode"))
       .check(status.is(200)))
   }
 
@@ -53,8 +53,8 @@ object Recherche_Produit_UGA {
       .get("sap/stores/storeCode/#{user_StoreCode}")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.sourceLatitude").saveAs("storeLatitude"))
-      .check(jsonPath("#.sourceLongitude").saveAs("storeLongitude"))
+      .check(jsonPath("$.sourceLatitude").saveAs("storeLatitude"))
+      .check(jsonPath("$.sourceLongitude").saveAs("storeLongitude"))
       .check(status.is(200)))
   }
 
@@ -73,7 +73,7 @@ object Recherche_Produit_UGA {
       .get("product-orchestration/#{UGA}?type=uga&getCcmProduct=true")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("#.sapProduct.price.value").saveAs("Price"))
+      .check(jsonPath("$.sapProduct.price.value").saveAs("Price"))
       .check(jsonPath("$.sapProduct.categories[*].name").findAll.saveAs("PVE_IDENTIFIER"))
       .check(status.is(200)))
   }
