@@ -31,6 +31,10 @@ object Recherche_Produit_UGA {
       .formParam("username", "p_ppve")
       .formParam("password", "Service12345!")
       .check(jsonPath("$.access_token").saveAs("access_token")))
+      .exec { session =>
+        println("Token :" + session("access_token").as[String])
+        session
+      }
   }
 
 
@@ -44,6 +48,11 @@ object Recherche_Produit_UGA {
       .check(jsonPath("$.badgeNumber").saveAs("user_BadgeNumber"))
       .check(jsonPath("$.storeCode").saveAs("user_StoreCode"))
       .check(status.is(200)))
+      .exec { session =>
+        println("user_BadgeNumber : "+ session("user_BadgeNumber").as[String])
+        println("user_StoreCode :" + session("user_StoreCode").as[String])
+        session
+      }
   }
 
 
@@ -63,19 +72,17 @@ object Recherche_Produit_UGA {
   /////////////////////////////////////////////
 
   def rechercheProduitUga() = {
-  exec { session =>
-      val categories = session("PVE_IDENTIFIER").as[Seq[String]]
-      val PVE_IDENTIFIER = categories.mkString("|")
-      println("PVE_IDENTIFIER: " + PVE_IDENTIFIER)
-      session.set("PVE_IDENTIFIER", PVE_IDENTIFIER)
-    }
-    .exec(http("Recherche de produit par UGA")
+    exec(http("Recherche de produit par UGA")
       .get("product-orchestration/#{UGA}?type=uga&getCcmProduct=true")
       .header("Content-Type", "application/json")
       .header("Authorization", "Bearer #{access_token}")
       .check(jsonPath("$.sapProduct.price.value").saveAs("Price"))
       .check(jsonPath("$.sapProduct.categories[*].name").findAll.saveAs("PVE_IDENTIFIER"))
       .check(status.is(200)))
+      .exec { session =>
+        println("PVE_IDENTIFIER :" + session("PVE_IDENTIFIER").as[String])
+        session
+      }
   }
 
   //Récupération des informations concernant la recherche de produit par UGA
@@ -112,12 +119,12 @@ object Recherche_Produit_UGA {
         .check(jsonPath("$.idT2sPage").saveAs("idT2sPageTracking"))
       )
       .exec(http("Get Additional Recommendation ID")
-        .get("recoT2sPageId?brand=GL&recoType=ADDITIONAL&pageScope=PRODUCT&pveIdentifier=${PVE_IDENTIFIER}")
+        .get("recoT2sPageId?brand=GL&recoType=ADDITIONAL&pageScope=PRODUCT&pveIdentifier=#{PVE_IDENTIFIER}")
         .header("Authorization", "Bearer ${access_token}")
         .check(jsonPath("$.idT2sPage").saveAs("idT2sPageAdditional"))
       )
       .exec(http("Get Similar Recommendation ID")
-        .get("recoT2sPageId?brand=GL&recoType=SIMILAR&pageScope=PRODUCT&pveIdentifier=${PVE_IDENTIFIER}")
+        .get("recoT2sPageId?brand=GL&recoType=SIMILAR&pageScope=PRODUCT&pveIdentifier=#{PVE_IDENTIFIER}")
         .header("Authorization", "Bearer ${access_token}")
         .check(jsonPath("$.idT2sPage").saveAs("idT2sPageSimilar"))
       )
@@ -128,9 +135,9 @@ object Recherche_Produit_UGA {
         .body(StringBody(
           """
             |{
-            |"pID":"${idT2sPageTracking}",
-            |"tID":"${UUID_V4}",
-            |"iID":["${PVE_IDENTIFIER}"],
+            |"pID":"#{idT2sPageTracking}",
+            |"tID":"#{UUID_V4}",
+            |"iID":["#{PVE_IDENTIFIER}"],
             |"eN":"VIEW"
             |}
             |""".stripMargin)).asJson
@@ -141,10 +148,10 @@ object Recherche_Produit_UGA {
         .body(StringBody(
           """
             |{
-            |"tID":"${UUID_V4}",
-            |"iID":"${UGA}-${COLOR_VARIANT}",
-            |"pID":"${idT2sPageSimilar}",
-            |"setID":"${user_StoreCode}"
+            |"tID":"#{UUID_V4}",
+            |"iID":"#{UGA}-${COLOR_VARIANT}",
+            |"pID":"#{idT2sPageSimilar}",
+            |"setID":"#{user_StoreCode}"
             |}
             |""".stripMargin)).asJson
       )
@@ -154,10 +161,10 @@ object Recherche_Produit_UGA {
         .body(StringBody(
           """
             |{
-            |"tID":"${UUID_V4}",
-            |"iID":"${UGA}-${COLOR_VARIANT}",
-            |"pID":"${idT2sPageAdditional}",
-            |"setID":"${user_StoreCode}"
+            |"tID":"#{UUID_V4}",
+            |"iID":"#{UGA}-${COLOR_VARIANT}",
+            |"pID":"#{idT2sPageAdditional}",
+            |"setID":"#{user_StoreCode}"
             |}
             |""".stripMargin)).asJson
       )

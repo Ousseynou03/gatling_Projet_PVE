@@ -66,7 +66,7 @@ object Recherche_Produit_EAN {
     exec(http("Search Product by EAN")
       .get("{PVE_SERVER_URL}product-orchestration/#{EAN}?type=EAN&getCcmProduct=true")
       .header("Authorization", "Bearer #{access_token}")
-      .check(jsonPath("$.sapProduct.code").saveAs("UGA"))
+      //.check(jsonPath("$.sapProduct.code").saveAs("UGA"))
       .check(jsonPath("$.sapProduct.price.value").saveAs("PRICE"))
       .check(jsonPath("$.sapProduct.categories[*].name").findAll.saveAs("PVE_IDENTIFIER"))
     )

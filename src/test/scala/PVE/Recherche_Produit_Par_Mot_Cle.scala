@@ -68,11 +68,6 @@ object Recherche_Produit_Par_Mot_Cle {
       .header("Authorization", "Bearer #{access_token}")
       .check(jsonPath("$.products[*].basicColor").findAll.saveAs("basicColors"))
     )
-      .exec { session =>
-        val colors = session("basicColors").as[Seq[String]]
-        println("Basic Colors: " + colors.mkString(", "))
-        session
-      }
   }
 
   def get_Tracking_Page_ID() = {
@@ -83,6 +78,8 @@ object Recherche_Produit_Par_Mot_Cle {
     )
   }
 
+
+  // A vérifier le "iID":[#{productIds}]
   def recommendation_Tracking() = {
     exec(session => {
       val UUID_V4 = randomUUID()
